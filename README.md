@@ -1,3 +1,15 @@
+### EOW Edits 
+Added Emergency Services Menu with Vehicle Spawner and EUP Menu sub-menus
+Vehicle Spawner allows Servers to add a custom name to the vehicles in the menu 
+EUP Menus allow admins to create outfits and save them to the Department sub-menu
+
+
+
+
+
+
+
+
 #### Latest Builds
 
 ##### Latest AppVeyor build
