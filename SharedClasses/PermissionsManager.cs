@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -162,6 +162,13 @@ namespace vMenuShared
             PVToggleAlarm,
             PVAddBlip,
             PVExclusiveDriver,
+            #endregion
+
+            // Emergency Services
+            #region emergency services
+            ESMenu,
+            ESAll,
+            ESSaveOutfits, // Admin only: save EUP outfits to shared list for all players
             #endregion
 
             // Player Appearance
@@ -585,6 +592,13 @@ namespace vMenuShared
             // Also tell the client to do the addons setup.
             player.TriggerEvent("vMenu:SetConfigOptions");
             player.TriggerEvent("vMenu:UpdateTeleportLocations", Newtonsoft.Json.JsonConvert.SerializeObject(ConfigManager.GetTeleportLocationsData()));
+
+            // Send emergency services config from server (client may not have config/ in its resource path).
+            var emergencyServicesJson = LoadResourceFile(GetCurrentResourceName(), "config/emergency_services.json");
+            if (!string.IsNullOrEmpty(emergencyServicesJson))
+            {
+                player.TriggerEvent("vMenu:SetEmergencyServicesConfig", emergencyServicesJson);
+            }
         }
 #endif
 #if CLIENT
@@ -633,6 +647,9 @@ namespace vMenuShared
                     break;
                 case "PV":
                     prefix += "PersonalVehicle";
+                    break;
+                case "ES":
+                    prefix += "EmergencyServices";
                     break;
                 case "PA":
                     prefix += "PlayerAppearance";

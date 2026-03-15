@@ -36,6 +36,7 @@ namespace vMenuClient
         public static BannedPlayers BannedPlayersMenu { get; private set; }
         public static SavedVehicles SavedVehiclesMenu { get; private set; }
         public static PersonalVehicle PersonalVehicleMenu { get; private set; }
+        public static EmergencyServices EmergencyServicesMenu { get; private set; }
         public static VehicleOptions VehicleOptionsMenu { get; private set; }
         public static VehicleSpawner VehicleSpawnerMenu { get; private set; }
         public static PlayerAppearance PlayerAppearanceMenu { get; private set; }
@@ -688,6 +689,19 @@ namespace vMenuClient
 
             var vehicleSubmenuBtn = new MenuItem("Vehicle Related Options", "Open this submenu for vehicle related subcategories.") { Label = "→→→" };
             Menu.AddMenuItem(vehicleSubmenuBtn);
+
+            // Add the Emergency Services menu to the main menu.
+            if (IsAllowed(Permission.ESMenu))
+            {
+                EmergencyServicesMenu = new EmergencyServices();
+                var menu = EmergencyServicesMenu.GetMenu();
+                var button = new MenuItem("Emergency Services", "Spawn emergency service vehicles with custom names per department.")
+                {
+                    Label = "→→→"
+                };
+                AddMenu(Menu, menu, button);
+            }
+
             // Add the vehicle options Menu.
             if (IsAllowed(Permission.VOMenu))
             {
