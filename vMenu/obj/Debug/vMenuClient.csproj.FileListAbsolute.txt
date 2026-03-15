@@ -1,0 +1,11 @@
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\build\vMenu\vMenuClient.net.dll
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenu\obj\Debug\vMenuClient.csproj.AssemblyReference.cache
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenu\obj\Debug\vMenuClient.net.g.resources
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenu\obj\Debug\vMenuClient.Properties.Resources.resources
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenu\obj\Debug\vMenuClient.csproj.GenerateResource.cache
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenu\obj\Debug\vMenuClient.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenu\obj\Debug\vMenuClient.AssemblyInfoInputs.cache
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenu\obj\Debug\vMenuClient.AssemblyInfo.cs
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenu\obj\Debug\vMenuClient.csproj.CoreCompileInputs.cache
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenu\obj\Debug\vMenuCli.89F3D59C.Up2Date
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenu\obj\Debug\vMenuClient.net.dll

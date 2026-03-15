@@ -1,0 +1,103 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETFramework,Version=v4.5.2": {
+      "CitizenFX.Core.Server/1.0.8883": {
+        "type": "package",
+        "compile": {
+          "lib/net45/CitizenFX.Core.Server.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net45/_._": {
+            "related": ".xml"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "CitizenFX.Core.Server/1.0.8883": {
+      "sha512": "vGc5u7m70eyZWdQ3U327kKRBzoJ4UptkEA2v5HerXf/acysVlyszKtBOO5RWW+ofDq9udOFE7sYChg62WyVWxA==",
+      "type": "package",
+      "path": "citizenfx.core.server/1.0.8883",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "citizenfx.core.server.1.0.8883.nupkg.sha512",
+        "citizenfx.core.server.nuspec",
+        "lib/net45/CitizenFX.Core.Server.dll",
+        "lib/net45/CitizenFX.Core.Server.xml",
+        "lib/netstandard20/CitizenFX.Core.Server.dll",
+        "lib/netstandard20/CitizenFX.Core.Server.xml"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    ".NETFramework,Version=v4.5.2": [
+      "CitizenFX.Core.Server >= 1.0.8883"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\micha\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\micha\\OneDrive\\Documents\\eow_framework\\vMenu-master\\vMenuServer\\vMenuServer.csproj",
+      "projectName": "vMenuServer.net",
+      "projectPath": "C:\\Users\\micha\\OneDrive\\Documents\\eow_framework\\vMenu-master\\vMenuServer\\vMenuServer.csproj",
+      "packagesPath": "C:\\Users\\micha\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\micha\\OneDrive\\Documents\\eow_framework\\vMenu-master\\vMenuServer\\obj\\",
+      "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
+      "configFilePaths": [
+        "C:\\Users\\micha\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net452"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net452": {
+          "targetAlias": "net452",
+          "projectReferences": {}
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "10.0.200"
+    },
+    "frameworks": {
+      "net452": {
+        "targetAlias": "net452",
+        "dependencies": {
+          "CitizenFX.Core.Server": {
+            "include": "Compile, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+            "target": "Package",
+            "version": "[1.0.8883, )"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201\\RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

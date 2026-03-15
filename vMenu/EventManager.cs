@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -39,6 +39,9 @@ namespace vMenuClient
             // Add event handlers.
             EventHandlers.Add("vMenu:SetAddons", new Action(SetConfigOptions)); // DEPRECATED: Backwards-compatible event handler; use 'vMenu:SetConfigOptions' instead
             EventHandlers.Add("vMenu:SetConfigOptions", new Action(SetConfigOptions));
+            EventHandlers.Add("vMenu:SetEmergencyServicesConfig", new Action<string>(SetEmergencyServicesFromServer));
+            EventHandlers.Add("vMenu:SendEupOutfits", new Action<string>(EmergencyServices.ReceiveServerEupOutfits));
+            EventHandlers.Add("vMenu:EupOutfitSaved", new Action<bool>(OnEupOutfitSaved));
             EventHandlers.Add("vMenu:SetPermissions", new Action<string>(MainMenu.SetPermissions));
             EventHandlers.Add("vMenu:KillMe", new Action<string>(KillMe));
             EventHandlers.Add("vMenu:Notify", new Action<string>(NotifyPlayer));
@@ -117,8 +120,63 @@ namespace vMenuClient
         {
             SetAddons();
             SetExtras();
+            SetEmergencyServices();
 
             MainMenu.ConfigOptionsSetupComplete = true;
+        }
+
+        /// <summary>
+        /// Loads emergency services vehicle config (department -> spawn code -> custom name).
+        /// Tries local config file first; server also sends config via vMenu:SetEmergencyServicesConfig for reliability.
+        /// </summary>
+        private void SetEmergencyServices()
+        {
+            EmergencyServices.EmergencyVehiclesByDepartment = new Dictionary<string, Dictionary<string, string>>();
+
+            var jsonData = LoadResourceFile(GetCurrentResourceName(), "config/emergency_services.json");
+            if (!string.IsNullOrEmpty(jsonData))
+            {
+                ApplyEmergencyServicesConfig(jsonData);
+            }
+        }
+
+        /// <summary>
+        /// Applies emergency services config JSON received from the server (so config is found even when client has no config/ path).
+        /// </summary>
+        private void SetEmergencyServicesFromServer(string jsonData)
+        {
+            if (string.IsNullOrEmpty(jsonData))
+            {
+                return;
+            }
+            ApplyEmergencyServicesConfig(jsonData);
+        }
+
+        private void ApplyEmergencyServicesConfig(string jsonData)
+        {
+            try
+            {
+                var config = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(jsonData);
+                if (config != null && config.Count > 0)
+                {
+                    EmergencyServices.EmergencyVehiclesByDepartment = config;
+                }
+            }
+            catch (JsonReaderException ex)
+            {
+                Debug.WriteLine($"[vMenu] [Error] emergency_services.json is invalid: {ex.Message}");
+            }
+        }
+
+        private void OnEupOutfitSaved(bool success)
+        {
+            if (success)
+            {
+                Notify.Success("Outfit saved to the shared list. All players can now use it in the department menus.");
+                TriggerServerEvent("vMenu:RequestEupOutfits");
+            }
+            else
+                Notify.Error("Failed to save outfit.");
         }
 
         /// <summary>

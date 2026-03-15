@@ -235,6 +235,22 @@ namespace vMenuServer
                     Debug.WriteLine($"\n\n^1[vMenu] [ERROR] ^7Your addons.json file contains a problem! Error details: {ex.Message}\n\n");
                 }
 
+                // check emergency_services file for errors
+                var emergencyServices = LoadResourceFile(GetCurrentResourceName(), "config/emergency_services.json");
+                if (!string.IsNullOrEmpty(emergencyServices))
+                {
+                    try
+                    {
+                        JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(emergencyServices);
+                    }
+                    catch (JsonReaderException ex)
+                    {
+                        Debug.WriteLine($"\n\n^1[vMenu] [ERROR] ^7Your emergency_services.json file contains a problem! Error details: {ex.Message}\n\n");
+                    }
+                }
+
+                LoadEupOutfits();
+
                 // check extras file for errors
                 string extras = LoadResourceFile(GetCurrentResourceName(), "config/extras.json") ?? "{}";
                 try
@@ -1074,6 +1090,62 @@ namespace vMenuServer
                 Log("Could not save locations.json file, reason unknown.", LogLevel.error);
             }
             TriggerClientEvent("vMenu:UpdateTeleportLocations", JsonConvert.SerializeObject(locs.teleports));
+        }
+        #endregion
+
+        #region EUP shared outfits (admin save, all players see)
+        private static Dictionary<string, List<string>> EupOutfitsByDepartment = new Dictionary<string, List<string>>();
+        private const string EupOutfitsFile = "config/eup_outfits.json";
+
+        private static void LoadEupOutfits()
+        {
+            try
+            {
+                var json = LoadResourceFile(GetCurrentResourceName(), EupOutfitsFile);
+                if (!string.IsNullOrEmpty(json))
+                    EupOutfitsByDepartment = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(json) ?? new Dictionary<string, List<string>>();
+            }
+            catch (Exception ex)
+            {
+                Log($"Failed to load EUP outfits: {ex.Message}", LogLevel.warning);
+                EupOutfitsByDepartment = new Dictionary<string, List<string>>();
+            }
+        }
+
+        private static bool SaveEupOutfits()
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(EupOutfitsByDepartment, Formatting.Indented);
+                return SaveResourceFile(GetCurrentResourceName(), EupOutfitsFile, json, -1);
+            }
+            catch (Exception ex)
+            {
+                Log($"Failed to save EUP outfits: {ex.Message}", LogLevel.error);
+                return false;
+            }
+        }
+
+        [EventHandler("vMenu:SaveEupOutfit")]
+        private void OnSaveEupOutfit([FromSource] Player player, string department, string outfitJson)
+        {
+            if (player == null || string.IsNullOrEmpty(department) || string.IsNullOrEmpty(outfitJson))
+                return;
+            if (!PermissionsManager.IsAllowed(PermissionsManager.Permission.ESSaveOutfits, player) && !PermissionsManager.IsAllowed(PermissionsManager.Permission.ESAll, player))
+                return;
+            if (!EupOutfitsByDepartment.ContainsKey(department))
+                EupOutfitsByDepartment[department] = new List<string>();
+            EupOutfitsByDepartment[department].Add(outfitJson);
+            SaveEupOutfits();
+            player.TriggerEvent("vMenu:EupOutfitSaved", true);
+        }
+
+        [EventHandler("vMenu:RequestEupOutfits")]
+        private void OnRequestEupOutfits([FromSource] Player player)
+        {
+            if (player == null) return;
+            var json = JsonConvert.SerializeObject(EupOutfitsByDepartment);
+            player.TriggerEvent("vMenu:SendEupOutfits", json);
         }
         #endregion
 

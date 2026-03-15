@@ -2187,7 +2187,16 @@ namespace vMenuClient
             public Dictionary<int, int> propTextures;
             public Dictionary<int, int> drawableVariations;
             public Dictionary<int, int> drawableVariationTextures;
-        };
+        }
+
+        /// <summary>
+        /// EUP outfit entry: display name + ped appearance data.
+        /// </summary>
+        public class EupOutfitData
+        {
+            public string DisplayName;
+            public PedInfo PedInfo;
+        }
         #endregion
 
         #region Set Player Skin
@@ -2466,6 +2475,32 @@ namespace vMenuClient
             return false;
         }
         #endregion
+
+        /// <summary>
+        /// Returns the current player ped appearance as PedInfo (for EUP outfit saving etc.).
+        /// </summary>
+        public static PedInfo GetCurrentPedInfo()
+        {
+            var ped = Game.PlayerPed.Handle;
+            var data = new PedInfo
+            {
+                version = 1,
+                model = (uint)GetEntityModel(ped),
+                drawableVariations = new Dictionary<int, int>(),
+                drawableVariationTextures = new Dictionary<int, int>(),
+                props = new Dictionary<int, int>(),
+                propTextures = new Dictionary<int, int>()
+            };
+            for (var i = 0; i < 21; i++)
+            {
+                data.drawableVariations.Add(i, GetPedDrawableVariation(ped, i));
+                data.drawableVariationTextures.Add(i, GetPedTextureVariation(ped, i));
+                data.props.Add(i, GetPedPropIndex(ped, i));
+                data.propTextures.Add(i, GetPedPropTextureIndex(ped, i));
+            }
+            data.isMpPed = data.model == (uint)GetHashKey("mp_f_freemode_01") || data.model == (uint)GetHashKey("mp_m_freemode_01");
+            return data;
+        }
 
         #region saved ped json string to ped info
         /// <summary>

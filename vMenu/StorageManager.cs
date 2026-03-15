@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 using CitizenFX.Core;
 
@@ -120,6 +120,81 @@ namespace vMenuClient
         public static void DeleteSavedStorageItem(string saveName)
         {
             DeleteResourceKvp(saveName);
+        }
+
+        /// <summary>
+        /// Sanitize a string for use in KVP key (no spaces, safe chars only).
+        /// </summary>
+        private static string SanitizeEupKey(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return "Outfit";
+            var s = new System.Text.StringBuilder();
+            foreach (var c in name.Trim())
+            {
+                if (char.IsLetterOrDigit(c) || c == '_' || c == '-') s.Append(c);
+                else if (c == ' ') s.Append('_');
+            }
+            return s.Length > 0 ? s.ToString() : "Outfit";
+        }
+
+        /// <summary>
+        /// Save an EUP outfit for a department. Key format: eup_{department}_{sanitizedName}.
+        /// </summary>
+        public static bool SaveEupOutfit(string department, string displayName, PedInfo pedInfo, bool overrideExisting = false)
+        {
+            var key = "eup_" + department + "_" + SanitizeEupKey(displayName);
+            var data = new EupOutfitData { DisplayName = displayName?.Trim() ?? "Outfit", PedInfo = pedInfo };
+            var json = JsonConvert.SerializeObject(data);
+            if (overrideExisting || string.IsNullOrEmpty(GetResourceKvpString(key)))
+            {
+                SetResourceKvp(key, json);
+                return GetResourceKvpString(key) == json;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Get all EUP outfit keys for a department (e.g. "LSPD", "SAST").
+        /// </summary>
+        public static Dictionary<string, EupOutfitData> GetEupOutfitsByDepartment(string department)
+        {
+            var prefix = "eup_" + department + "_";
+            var result = new Dictionary<string, EupOutfitData>();
+            var handle = StartFindKvp(prefix);
+            while (true)
+            {
+                var kvp = FindKvp(handle);
+                if (string.IsNullOrEmpty(kvp)) break;
+                var json = GetResourceKvpString(kvp);
+                if (!string.IsNullOrEmpty(json))
+                {
+                    try
+                    {
+                        var data = JsonConvert.DeserializeObject<EupOutfitData>(json);
+                        if (data != null)
+                            result[kvp] = data;
+                    }
+                    catch { /* ignore */ }
+                }
+            }
+            EndFindKvp(handle);
+            return result;
+        }
+
+        /// <summary>
+        /// Get one EUP outfit by full key (e.g. "eup_LSPD_Patrol_Uniform").
+        /// </summary>
+        public static EupOutfitData GetEupOutfit(string fullKey)
+        {
+            var json = GetResourceKvpString(fullKey);
+            if (string.IsNullOrEmpty(json)) return null;
+            try { return JsonConvert.DeserializeObject<EupOutfitData>(json); }
+            catch { return null; }
+        }
+
+        public static void DeleteEupOutfit(string fullKey)
+        {
+            DeleteResourceKvp(fullKey);
         }
 
         /// <summary>

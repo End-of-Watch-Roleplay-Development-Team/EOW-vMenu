@@ -1,0 +1,26 @@
+{
+  "Los Santos Police Department": {
+    "police": "Police Cruiser",
+    "police2": "Police Cruiser 2",
+    "M20FPIU": "2020 FPIU"
+  },
+  "Blaine County Sheriff's Office": {
+    "sheriff": "Sheriff Cruiser",
+    "sheriff2": "Sheriff SUV"
+  },
+  "San Andreas State Troopers": {
+    "police3": "State Cruiser",
+    "M20FPIU": "2020 FPIU"
+  },
+  "San Andreas Fire & Rescue": {
+    "firetruk": "Fire Truck",
+    "pbus": "Fire Rescue"
+  },
+  "San Andreas Emergency Medical Service": {
+    "ambulance": "Ambulance"
+  },
+  "San Andreas Department of Corrections": {
+    "pbus": "Prison Bus",
+    "police4": "Police Riot"
+  }
+}

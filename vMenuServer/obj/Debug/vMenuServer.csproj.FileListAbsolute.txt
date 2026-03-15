@@ -1,0 +1,14 @@
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\build\vMenu\config\addons.json
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\build\vMenu\config\emergency_services.json
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\build\vMenu\config\extras.json
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\build\vMenu\config\locations.json
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\build\vMenu\config\permissions.cfg
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\build\vMenu\storage.html
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\build\vMenu\System.Numerics.dll
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\build\vMenu\vMenuServer.net.dll
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenuServer\obj\Debug\vMenuServer.csproj.AssemblyReference.cache
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenuServer\obj\Debug\vMenuServer.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenuServer\obj\Debug\vMenuServer.AssemblyInfoInputs.cache
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenuServer\obj\Debug\vMenuServer.AssemblyInfo.cs
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenuServer\obj\Debug\vMenuServer.csproj.CoreCompileInputs.cache
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenuServer\obj\Debug\vMenuServer.net.dll
