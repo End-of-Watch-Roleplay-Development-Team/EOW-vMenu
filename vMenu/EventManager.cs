@@ -121,6 +121,7 @@ namespace vMenuClient
             SetAddons();
             SetExtras();
             SetEmergencyServices();
+            SetEmergencyServicesExtras();
 
             MainMenu.ConfigOptionsSetupComplete = true;
         }
@@ -165,6 +166,34 @@ namespace vMenuClient
             catch (JsonReaderException ex)
             {
                 Debug.WriteLine($"[vMenu] [Error] emergency_services.json is invalid: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Loads default extras for Emergency Services vehicles from config/emergency_services_extras.json.
+        /// Maps spawn code -> list of extra IDs that should be enabled by default.
+        /// </summary>
+        private void SetEmergencyServicesExtras()
+        {
+            EmergencyServices.DefaultExtrasBySpawnCode = new Dictionary<string, List<int>>();
+
+            var jsonData = LoadResourceFile(GetCurrentResourceName(), "config/emergency_services_extras.json");
+            if (string.IsNullOrEmpty(jsonData))
+            {
+                return;
+            }
+
+            try
+            {
+                var config = JsonConvert.DeserializeObject<Dictionary<string, List<int>>>(jsonData);
+                if (config != null && config.Count > 0)
+                {
+                    EmergencyServices.DefaultExtrasBySpawnCode = config;
+                }
+            }
+            catch (JsonReaderException ex)
+            {
+                Debug.WriteLine($"[vMenu] [Error] emergency_services_extras.json is invalid: {ex.Message}");
             }
         }
 

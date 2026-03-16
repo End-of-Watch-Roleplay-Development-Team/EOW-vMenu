@@ -12,3 +12,5 @@ C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenuServer\obj\Deb
 C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenuServer\obj\Debug\vMenuServer.AssemblyInfo.cs
 C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenuServer\obj\Debug\vMenuServer.csproj.CoreCompileInputs.cache
 C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenuServer\obj\Debug\vMenuServer.net.dll
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\build\vMenu\config\emergency_services_extras.json
+C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\build\vMenu\config\eup_outfits.json

@@ -1131,7 +1131,8 @@ namespace vMenuServer
         {
             if (player == null || string.IsNullOrEmpty(department) || string.IsNullOrEmpty(outfitJson))
                 return;
-            if (!PermissionsManager.IsAllowed(PermissionsManager.Permission.ESSaveOutfits, player) && !PermissionsManager.IsAllowed(PermissionsManager.Permission.ESAll, player))
+            // Only ESSaveOutfits controls saving; ESAll should not implicitly grant this.
+            if (!PermissionsManager.IsAllowed(PermissionsManager.Permission.ESSaveOutfits, player))
                 return;
             if (!EupOutfitsByDepartment.ContainsKey(department))
                 EupOutfitsByDepartment[department] = new List<string>();
