@@ -34,6 +34,9 @@ namespace vMenuClient.menus
         /// <summary>Department submenus by key, so we can refresh when server sends outfit list.</summary>
         public static Dictionary<string, Menu> EupDeptMenusByKey { get; set; }
 
+        /// <summary>Default extras per spawn code for Emergency Services vehicles (enabled when they spawn).</summary>
+        public static Dictionary<string, List<int>> DefaultExtrasBySpawnCode { get; set; } = new Dictionary<string, List<int>>();
+
         private static readonly string[] DepartmentNames =
         {
             "Los Santos Police Department",
@@ -204,7 +207,23 @@ namespace vMenuClient.menus
                         {
                             var spawnInside = MainMenu.VehicleSpawnerMenu != null && MainMenu.VehicleSpawnerMenu.SpawnInVehicle;
                             var replacePrev = MainMenu.VehicleSpawnerMenu != null && MainMenu.VehicleSpawnerMenu.ReplaceVehicle;
-                            await SpawnVehicle(code, spawnInside, replacePrev);
+                            var vehHandle = await SpawnVehicle(code, spawnInside, replacePrev);
+
+                            if (vehHandle != 0 && DefaultExtrasBySpawnCode != null && DefaultExtrasBySpawnCode.ContainsKey(code))
+                            {
+                                var extras = DefaultExtrasBySpawnCode[code];
+                                if (extras != null)
+                                {
+                                    foreach (var extraId in extras)
+                                    {
+                                        if (extraId >= 0 && DoesExtraExist(vehHandle, extraId))
+                                        {
+                                            // false = enable extra
+                                            SetVehicleExtra(vehHandle, extraId, false);
+                                        }
+                                    }
+                                }
+                            }
                         }
                     };
                 }
