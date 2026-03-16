@@ -2197,6 +2197,89 @@ namespace vMenuClient
             public string DisplayName;
             public PedInfo PedInfo;
         }
+
+        /// <summary>
+        /// Applies only clothing/props from a saved <see cref="PedInfo"/> to the current player ped.
+        /// Does NOT change the player model or other character data.
+        /// </summary>
+        public static void ApplyPedClothing(PedInfo pedInfo)
+        {
+            if (pedInfo.version != 1)
+            {
+                Notify.Error("Unsupported outfit data version.");
+                return;
+            }
+
+            var ped = Game.PlayerPed.Handle;
+
+            // Components to NOT touch when applying outfits (keep player's character identity):
+            // 1: Mask / Facial Hair (beards)
+            // 2: Hair Style / Color (hair)
+            // 10: Decals/Badges/Logos (often used for overlays; also avoids some tattoo-like changes)
+            // Note: Eyebrows and tattoos are usually head overlays / decorations which this function does not apply,
+            // but we still skip 10 to avoid decal-based "tattoo" packs.
+            var excludedComponents = new HashSet<int> { 1, 2 };
+
+            // Apply components (0-11 are standard clothing slots; vMenu saves up to 20, we safely try all keys that exist).
+            if (pedInfo.drawableVariations != null && pedInfo.drawableVariationTextures != null)
+            {
+                foreach (var kvp in pedInfo.drawableVariations)
+                {
+                    var componentId = kvp.Key;
+                    var drawable = kvp.Value;
+                    int texture = 0;
+                    if (pedInfo.drawableVariationTextures.ContainsKey(componentId))
+                        texture = pedInfo.drawableVariationTextures[componentId];
+
+                    // Skip invalid component ids
+                    if (componentId < 0 || componentId > 20) continue;
+                    if (excludedComponents.Contains(componentId)) continue;
+
+                    // Clamp drawable/texture to what's available for this ped model.
+                    var maxDrawables = GetNumberOfPedDrawableVariations(ped, componentId);
+                    if (maxDrawables <= 0) continue;
+                    if (drawable < 0 || drawable >= maxDrawables) continue;
+
+                    var maxTextures = GetNumberOfPedTextureVariations(ped, componentId, drawable);
+                    if (maxTextures <= 0) texture = 0;
+                    else if (texture < 0 || texture >= maxTextures) texture = 0;
+
+                    SetPedComponentVariation(ped, componentId, drawable, texture, 1);
+                }
+            }
+
+            // Apply props (0-7 are standard; vMenu saves up to 20, we safely try all keys that exist).
+            if (pedInfo.props != null && pedInfo.propTextures != null)
+            {
+                foreach (var kvp in pedInfo.props)
+                {
+                    var propId = kvp.Key;
+                    var prop = kvp.Value;
+
+                    if (propId < 0 || propId > 20) continue;
+
+                    int propTexture = 0;
+                    if (pedInfo.propTextures.ContainsKey(propId))
+                        propTexture = pedInfo.propTextures[propId];
+
+                    if (prop < 0)
+                    {
+                        ClearPedProp(ped, propId);
+                        continue;
+                    }
+
+                    var maxProps = GetNumberOfPedPropDrawableVariations(ped, propId);
+                    if (maxProps <= 0) continue;
+                    if (prop >= maxProps) continue;
+
+                    var maxPropTextures = GetNumberOfPedPropTextureVariations(ped, propId, prop);
+                    if (maxPropTextures <= 0) propTexture = 0;
+                    else if (propTexture < 0 || propTexture >= maxPropTextures) propTexture = 0;
+
+                    SetPedPropIndex(ped, propId, prop, propTexture, true);
+                }
+            }
+        }
         #endregion
 
         #region Set Player Skin

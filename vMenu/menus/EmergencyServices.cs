@@ -34,6 +34,9 @@ namespace vMenuClient.menus
         /// <summary>Department submenus by key, so we can refresh when server sends outfit list.</summary>
         public static Dictionary<string, Menu> EupDeptMenusByKey { get; set; }
 
+        /// <summary>Default extras per spawn code for Emergency Services vehicles (enabled when they spawn).</summary>
+        public static Dictionary<string, List<int>> DefaultExtrasBySpawnCode { get; set; } = new Dictionary<string, List<int>>();
+
         private static readonly string[] DepartmentNames =
         {
             "Los Santos Police Department",
@@ -87,7 +90,8 @@ namespace vMenuClient.menus
             // Create Outfit: admin only – save to server so ALL players see it in department menus
             var createOutfitMenu = new Menu("EUP", "Create Outfit");
             var createOutfitBtn = new MenuItem("Create Outfit", "~o~Admin only.~s~ Save your current appearance to the shared list so all players can use it in department menus.") { Label = "→→→" };
-            var canSaveOutfits = IsAllowed(Permission.ESSaveOutfits) || IsAllowed(Permission.ESAll);
+            // Only ESSaveOutfits controls this; ESAll still controls general Emergency Services access but not saving outfits.
+            var canSaveOutfits = IsAllowed(Permission.ESSaveOutfits);
             if (canSaveOutfits)
             {
                 eupMenu.AddMenuItem(createOutfitBtn);
@@ -152,12 +156,12 @@ namespace vMenuClient.menus
                     RefreshEupDepartmentMenu(deptMenu, keyCapture);
                 };
                 deptMenu.OnMenuClose += (sender) => CurrentOpenEupDepartmentKey = null;
-                deptMenu.OnItemSelect += async (sender, item, index) =>
+                deptMenu.OnItemSelect += (sender, item, index) =>
                 {
                     if (item?.ItemData is KeyValuePair<string, EupOutfitData> pair && pair.Value != null)
                     {
                         var data = pair.Value;
-                        await SetPlayerSkin(data.PedInfo.model, data.PedInfo, true);
+                        ApplyPedClothing(data.PedInfo);
                     }
                 };
             }
@@ -204,7 +208,23 @@ namespace vMenuClient.menus
                         {
                             var spawnInside = MainMenu.VehicleSpawnerMenu != null && MainMenu.VehicleSpawnerMenu.SpawnInVehicle;
                             var replacePrev = MainMenu.VehicleSpawnerMenu != null && MainMenu.VehicleSpawnerMenu.ReplaceVehicle;
-                            await SpawnVehicle(code, spawnInside, replacePrev);
+                            var vehHandle = await SpawnVehicle(code, spawnInside, replacePrev);
+
+                            if (vehHandle != 0 && DefaultExtrasBySpawnCode != null && DefaultExtrasBySpawnCode.ContainsKey(code))
+                            {
+                                var extras = DefaultExtrasBySpawnCode[code];
+                                if (extras != null)
+                                {
+                                    foreach (var extraId in extras)
+                                    {
+                                        if (extraId >= 0 && DoesExtraExist(vehHandle, extraId))
+                                        {
+                                            // false = enable extra
+                                            SetVehicleExtra(vehHandle, extraId, false);
+                                        }
+                                    }
+                                }
+                            }
                         }
                     };
                 }

@@ -1,0 +1,15 @@
+{
+  // This file is managed by vMenu at runtime.
+  // Admins with vMenu.EmergencyServices.SaveOutfits can save EUP outfits into this shared list.
+  // Structure (for reference):
+  // {
+  //   "LSPD": [
+  //     "{ \"DisplayName\": \"Patrol Uniform\", \"PedInfo\": { ... } }",
+  //     "{ \"DisplayName\": \"Traffic\", \"PedInfo\": { ... } }"
+  //   ],
+  //   "SAST": [
+  //     "{ \"DisplayName\": \"Trooper\", \"PedInfo\": { ... } }"
+  //   ]
+  // }
+}
+
