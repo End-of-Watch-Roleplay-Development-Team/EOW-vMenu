@@ -1,3 +1,27 @@
+# End of Watch Roleplay Edits
+--------
+### Added:
+- Emergency Services Menu 
+ - EUP Menu
+ - Vehicle Spawner
+ - Default Extras
+
+ ### EUP Menu
+
+ Allows users to with the ace "vMenu.EmergencyServices.SaveOutfits" to save outfits to a department sub-menu. when an outfit is saved we write it to the eup_outfits.json at runtime.
+ The EUP menu also features an accessory section so that players can equip a Vest or Hat on the fly.
+
+ ### Vehicle Spawner
+
+ Allows Servers to add their emergency vehiclees to the emergency_services.json with a cusstom name, to go along with this I havee also introduced defaul extras that can be set in the emergency_services_extras.json so that these vehicles always spawn with certain extras.
+
+
+
+
+
+
+
+
 #### Latest Builds
 
 ##### Latest AppVeyor build
