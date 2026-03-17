@@ -13,7 +13,7 @@
 
  ### Vehicle Spawner
 
- Allows Servers to add their emergency vehiclees to the emergency_services.json with a cusstom name, to go along with this I havee also introduced defaul extras that can be set in the emergency_services_extras.json so that these vehicles always spawn with certain extras.
+ Allows Servers to add their emergency vehiclees to the emergency_services.json with a cusstom name, to go along with this I have also introduced default extras that can be set in the emergency_services_extras.json so that these vehicles always spawn with certain extras.
 
 
 
