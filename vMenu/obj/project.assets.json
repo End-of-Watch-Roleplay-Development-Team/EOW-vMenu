@@ -15,8 +15,14 @@
           }
         }
       },
-      "MenuAPI.FiveM/3.2.2": {
+      "MenuAPI.FiveM/3.2.4": {
         "type": "package",
+        "dependencies": {
+          "CitizenFX.Core.Client": "1.0.3394"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp"
+        ],
         "compile": {
           "lib/net452/MenuAPI.dll": {}
         },
@@ -52,15 +58,15 @@
         "lib/net45/CitizenFX.Core.Client.xml"
       ]
     },
-    "MenuAPI.FiveM/3.2.2": {
-      "sha512": "ejs0gch6NDS7o3tjeiJ11xie9aYTBn6mSWvHEO4gztZSAerzUDfN2Ph35BEzvtH0wFAecbPMBZthKVDZiFM6OQ==",
+    "MenuAPI.FiveM/3.2.4": {
+      "sha512": "3gGgThBdwKXe7Xw4N2Vr9/+Y44vzAwWe6tbon2O/LSEgVcjP2b7PexbrkB/WJlVWNPrQILzhGRNoyckGH0e0pw==",
       "type": "package",
-      "path": "menuapi.fivem/3.2.2",
+      "path": "menuapi.fivem/3.2.4",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "lib/net452/MenuAPI.dll",
-        "menuapi.fivem.3.2.2.nupkg.sha512",
+        "menuapi.fivem.3.2.4.nupkg.sha512",
         "menuapi.fivem.nuspec"
       ]
     },
@@ -406,7 +412,7 @@
   "projectFileDependencyGroups": {
     ".NETFramework,Version=v4.6.2": [
       "CitizenFX.Core.Client >= 1.0.10188",
-      "MenuAPI.FiveM >= 3.2.2",
+      "MenuAPI.FiveM >= 3.2.4",
       "Microsoft.NETFramework.ReferenceAssemblies >= 1.0.3"
     ]
   },
@@ -417,11 +423,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\micha\\OneDrive\\Documents\\eow_framework\\vMenu-master\\vMenu\\vMenuClient.csproj",
+      "projectUniqueName": "D:\\FiveM\\in dev\\EOW-vMenu-master\\vMenu\\vMenuClient.csproj",
       "projectName": "vMenuClient.net",
-      "projectPath": "C:\\Users\\micha\\OneDrive\\Documents\\eow_framework\\vMenu-master\\vMenu\\vMenuClient.csproj",
+      "projectPath": "D:\\FiveM\\in dev\\EOW-vMenu-master\\vMenu\\vMenuClient.csproj",
       "packagesPath": "C:\\Users\\micha\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\micha\\OneDrive\\Documents\\eow_framework\\vMenu-master\\vMenu\\obj\\",
+      "outputPath": "D:\\FiveM\\in dev\\EOW-vMenu-master\\vMenu\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -468,7 +474,7 @@
           },
           "MenuAPI.FiveM": {
             "target": "Package",
-            "version": "[3.2.2, )"
+            "version": "[3.2.4, )"
           },
           "Microsoft.NETFramework.ReferenceAssemblies": {
             "suppressParent": "All",
@@ -477,7 +483,7 @@
             "autoReferenced": true
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.202\\RuntimeIdentifierGraph.json"
       }
     }
   }

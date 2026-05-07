@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\micha\\OneDrive\\Documents\\eow_framework\\vMenu-master\\vMenuServer\\vMenuServer.csproj": {}
+    "D:\\FiveM\\in dev\\EOW-vMenu-master\\vMenuServer\\vMenuServer.csproj": {}
   },
   "projects": {
-    "C:\\Users\\micha\\OneDrive\\Documents\\eow_framework\\vMenu-master\\vMenuServer\\vMenuServer.csproj": {
+    "D:\\FiveM\\in dev\\EOW-vMenu-master\\vMenuServer\\vMenuServer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\micha\\OneDrive\\Documents\\eow_framework\\vMenu-master\\vMenuServer\\vMenuServer.csproj",
+        "projectUniqueName": "D:\\FiveM\\in dev\\EOW-vMenu-master\\vMenuServer\\vMenuServer.csproj",
         "projectName": "vMenuServer.net",
-        "projectPath": "C:\\Users\\micha\\OneDrive\\Documents\\eow_framework\\vMenu-master\\vMenuServer\\vMenuServer.csproj",
+        "projectPath": "D:\\FiveM\\in dev\\EOW-vMenu-master\\vMenuServer\\vMenuServer.csproj",
         "packagesPath": "C:\\Users\\micha\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\micha\\OneDrive\\Documents\\eow_framework\\vMenu-master\\vMenuServer\\obj\\",
+        "outputPath": "D:\\FiveM\\in dev\\EOW-vMenu-master\\vMenuServer\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -57,7 +57,7 @@
               "version": "[1.0.8883, )"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.202\\RuntimeIdentifierGraph.json"
         }
       }
     }

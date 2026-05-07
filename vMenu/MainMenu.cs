@@ -346,7 +346,47 @@ namespace vMenuClient
             public Vector3 Coords { get; set; }
         }
 
+        public readonly struct PlateCheckResult
+        {
+            public bool IsDuplicate { get; }
+            public string ErrorMessage { get; }
+
+            public PlateCheckResult(bool isDuplicate, string errorMessage)
+            {
+                IsDuplicate = isDuplicate;
+                ErrorMessage = errorMessage ?? string.Empty;
+            }
+        }
+
+        public readonly struct SaveOwnedVehicleResult
+        {
+            public bool Success { get; }
+            public string ErrorMessage { get; }
+
+            public SaveOwnedVehicleResult(bool success, string errorMessage)
+            {
+                Success = success;
+                ErrorMessage = errorMessage ?? string.Empty;
+            }
+        }
+
+        struct PlateCheckRpcData
+        {
+            public bool IsCompleted { get; set; }
+            public bool IsDuplicate { get; set; }
+            public string ErrorMessage { get; set; }
+        }
+
+        struct SaveOwnedVehicleRpcData
+        {
+            public bool IsCompleted { get; set; }
+            public bool Success { get; set; }
+            public string ErrorMessage { get; set; }
+        }
+
         private static Dictionary<long, RPCData> rpcQueue = new Dictionary<long, RPCData>();
+        private static Dictionary<long, PlateCheckRpcData> plateCheckQueue = new Dictionary<long, PlateCheckRpcData>();
+        private static Dictionary<long, SaveOwnedVehicleRpcData> saveOwnedVehicleQueue = new Dictionary<long, SaveOwnedVehicleRpcData>();
         private static long rpcIdCounter = 0;
 
         [EventHandler("vMenu:GetPlayerCoords:reply")]
@@ -381,6 +421,80 @@ namespace vMenuClient
             rpcQueue.Remove(rpcId);
 
             return coords;
+        }
+
+        [EventHandler("vMenu:OwnedVehiclePlateCheck:reply")]
+        public static void OwnedVehiclePlateCheckReply(long rpcId, bool isDuplicate, string errorMessage)
+        {
+            if (!plateCheckQueue.ContainsKey(rpcId))
+            {
+                return;
+            }
+
+            var rpcItem = plateCheckQueue[rpcId];
+            rpcItem.IsCompleted = true;
+            rpcItem.IsDuplicate = isDuplicate;
+            rpcItem.ErrorMessage = errorMessage ?? string.Empty;
+            plateCheckQueue[rpcId] = rpcItem;
+        }
+
+        [EventHandler("vMenu:SaveOwnedVehicle:reply")]
+        public static void SaveOwnedVehicleReply(long rpcId, bool success, string errorMessage)
+        {
+            if (!saveOwnedVehicleQueue.ContainsKey(rpcId))
+            {
+                return;
+            }
+
+            var rpcItem = saveOwnedVehicleQueue[rpcId];
+            rpcItem.IsCompleted = true;
+            rpcItem.Success = success;
+            rpcItem.ErrorMessage = errorMessage ?? string.Empty;
+            saveOwnedVehicleQueue[rpcId] = rpcItem;
+        }
+
+        public static async Task<PlateCheckResult> CheckOwnedVehiclePlate(string plate, string savedName)
+        {
+            long rpcId = rpcIdCounter++;
+            plateCheckQueue.Add(rpcId, new PlateCheckRpcData
+            {
+                IsCompleted = false,
+                IsDuplicate = true,
+                ErrorMessage = string.Empty
+            });
+
+            TriggerServerEvent("vMenu:OwnedVehiclePlateCheck", rpcId, plate, savedName);
+
+            while (!plateCheckQueue[rpcId].IsCompleted)
+            {
+                await Delay(0);
+            }
+
+            var result = plateCheckQueue[rpcId];
+            plateCheckQueue.Remove(rpcId);
+            return new PlateCheckResult(result.IsDuplicate, result.ErrorMessage);
+        }
+
+        public static async Task<SaveOwnedVehicleResult> SaveOwnedVehicle(uint model, string displayName, string savedName, string plate, string vehicleJson)
+        {
+            long rpcId = rpcIdCounter++;
+            saveOwnedVehicleQueue.Add(rpcId, new SaveOwnedVehicleRpcData
+            {
+                IsCompleted = false,
+                Success = false,
+                ErrorMessage = string.Empty
+            });
+
+            TriggerServerEvent("vMenu:SaveOwnedVehicle", rpcId, model, displayName, savedName, plate, vehicleJson);
+
+            while (!saveOwnedVehicleQueue[rpcId].IsCompleted)
+            {
+                await Delay(0);
+            }
+
+            var result = saveOwnedVehicleQueue[rpcId];
+            saveOwnedVehicleQueue.Remove(rpcId);
+            return new SaveOwnedVehicleResult(result.Success, result.ErrorMessage);
         }
         #endregion
 

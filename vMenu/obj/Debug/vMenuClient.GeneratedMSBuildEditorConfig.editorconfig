@@ -1,6 +1,6 @@
 is_global = true
 build_property.RootNamespace = vMenuClient
-build_property.ProjectDir = C:\Users\micha\OneDrive\Documents\eow_framework\vMenu-master\vMenu\
+build_property.ProjectDir = D:\FiveM\in dev\EOW-vMenu-master\vMenu\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.CsWinRTUseWindowsUIXamlProjections = false

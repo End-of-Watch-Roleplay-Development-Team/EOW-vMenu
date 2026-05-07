@@ -59,6 +59,7 @@ namespace vMenuServer
 
     public class MainServer : BaseScript
     {
+        private const string OwnedVehiclesTable = "ble_owned_vehicles";
         #region vars
         // Debug shows more information when doing certain things. Leave it off to improve performance!
         public static bool DebugMode = GetResourceMetadata(GetCurrentResourceName(), "server_debug_mode", 0) == "true";
@@ -185,6 +186,247 @@ namespace vMenuServer
             "XMAS",
             "HALLOWEEN"
         };
+        #endregion
+
+        #region Owned vehicle persistence
+        private static string NormalizePlate(string plate)
+        {
+            if (string.IsNullOrWhiteSpace(plate))
+            {
+                return string.Empty;
+            }
+
+            plate = plate.Trim().ToUpperInvariant();
+            return plate.Length > 8 ? plate.Substring(0, 8) : plate;
+        }
+
+        private bool TryGetPlayerCharacterId(int sourceId, out int charId)
+        {
+            charId = 0;
+            try
+            {
+                // Preferred path: use ble_framework exported server functions.
+                try
+                {
+                    dynamic framework = Exports["ble_framework"].getServerFunctions();
+                    if (framework != null)
+                    {
+                        object playerFromFunction = framework.getPlayer(sourceId);
+                        if (TryExtractCharId(playerFromFunction, out charId))
+                        {
+                            return true;
+                        }
+                    }
+                }
+                catch
+                {
+                    // Fall back to geteverything() lookup below.
+                }
+
+                dynamic players = Exports["ble_framework"].geteverything();
+                if (players == null)
+                {
+                    return false;
+                }
+
+                string key = sourceId.ToString();
+
+                // IDictionary lookup when the export returns a native dictionary.
+                if (players is IDictionary<string, object> stringDict && stringDict.TryGetValue(key, out object playerDataObj))
+                {
+                    if (TryExtractCharId(playerDataObj, out charId))
+                    {
+                        return true;
+                    }
+                }
+
+                if (players is IDictionary<object, object> objectDict && objectDict.TryGetValue(key, out object playerDataObj2))
+                {
+                    if (TryExtractCharId(playerDataObj2, out charId))
+                    {
+                        return true;
+                    }
+                }
+
+                if (players is IDictionary<int, object> intDict && intDict.TryGetValue(sourceId, out object playerDataObj3))
+                {
+                    if (TryExtractCharId(playerDataObj3, out charId))
+                    {
+                        return true;
+                    }
+                }
+
+                if (players is IDictionary<long, object> longDict && longDict.TryGetValue(sourceId, out object playerDataObj4))
+                {
+                    if (TryExtractCharId(playerDataObj4, out charId))
+                    {
+                        return true;
+                    }
+                }
+
+                if (players is IDictionary<object, object> objectDict2 && objectDict2.TryGetValue(sourceId, out object playerDataObj5))
+                {
+                    if (TryExtractCharId(playerDataObj5, out charId))
+                    {
+                        return true;
+                    }
+                }
+
+                if (players is IDictionary<object, object> objectDict3 && objectDict3.TryGetValue((long)sourceId, out object playerDataObj6))
+                {
+                    if (TryExtractCharId(playerDataObj6, out charId))
+                    {
+                        return true;
+                    }
+                }
+
+                // Dynamic fallback.
+                object playerData = players[key];
+                if (TryExtractCharId(playerData, out charId))
+                {
+                    return true;
+                }
+
+                object playerDataByInt = players[sourceId];
+                if (TryExtractCharId(playerDataByInt, out charId))
+                {
+                    return true;
+                }
+
+                object playerDataByLong = players[(long)sourceId];
+                return TryExtractCharId(playerDataByLong, out charId);
+            }
+            catch (Exception ex)
+            {
+                Log($"Failed to resolve char ID from ble_framework export: {ex.Message}", LogLevel.warning);
+                return false;
+            }
+        }
+
+        private static bool TryExtractCharId(object playerData, out int charId)
+        {
+            charId = 0;
+            if (playerData == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                if (playerData is IDictionary<string, object> dict && dict.TryGetValue("charid", out object cObj) && int.TryParse($"{cObj}", out charId))
+                {
+                    return charId > 0;
+                }
+
+                if (playerData is IDictionary<object, object> objDict && objDict.TryGetValue("charid", out object cObj2) && int.TryParse($"{cObj2}", out charId))
+                {
+                    return charId > 0;
+                }
+
+                dynamic dyn = playerData;
+                if (int.TryParse($"{dyn.charid}", out charId))
+                {
+                    return charId > 0;
+                }
+            }
+            catch
+            {
+                // Ignore parse errors and return false.
+            }
+
+            return false;
+        }
+
+        [EventHandler("vMenu:OwnedVehiclePlateCheck")]
+        private void CheckOwnedVehiclePlate([FromSource] Player source, long rpcId, string plate, string savedName)
+        {
+            string normalizedPlate = NormalizePlate(plate);
+            if (string.IsNullOrEmpty(normalizedPlate))
+            {
+                source.TriggerEvent("vMenu:OwnedVehiclePlateCheck:reply", rpcId, true, "Invalid plate.");
+                return;
+            }
+
+            if (!TryGetPlayerCharacterId(int.Parse(source.Handle), out int charId))
+            {
+                source.TriggerEvent("vMenu:OwnedVehiclePlateCheck:reply", rpcId, true, "Could not resolve active character ID.");
+                return;
+            }
+
+            string safeSaveName = (savedName ?? string.Empty).Trim();
+
+            try
+            {
+                dynamic oxmysql = Exports["oxmysql"];
+                string query = $"SELECT id FROM {OwnedVehiclesTable} WHERE plate = @plate AND NOT (char_id = @char_id AND saved_name = @saved_name) LIMIT 1";
+                var parameters = new Dictionary<string, object>
+                {
+                    ["@plate"] = normalizedPlate,
+                    ["@char_id"] = charId,
+                    ["@saved_name"] = safeSaveName,
+                };
+
+                oxmysql.scalar(query, parameters, new Action<object>((result) =>
+                {
+                    bool duplicate = result != null && $"{result}" != string.Empty;
+                    source.TriggerEvent("vMenu:OwnedVehiclePlateCheck:reply", rpcId, duplicate, string.Empty);
+                }));
+            }
+            catch (Exception ex)
+            {
+                Log($"Owned vehicle plate check failed: {ex.Message}", LogLevel.warning);
+                source.TriggerEvent("vMenu:OwnedVehiclePlateCheck:reply", rpcId, true, "Database check failed.");
+            }
+        }
+
+        [EventHandler("vMenu:SaveOwnedVehicle")]
+        private void SaveOwnedVehicle([FromSource] Player source, long rpcId, uint model, string displayName, string savedName, string plate, string vehicleJson)
+        {
+            string normalizedPlate = NormalizePlate(plate);
+            if (string.IsNullOrEmpty(normalizedPlate))
+            {
+                source.TriggerEvent("vMenu:SaveOwnedVehicle:reply", rpcId, false, "Invalid plate.");
+                return;
+            }
+
+            if (!TryGetPlayerCharacterId(int.Parse(source.Handle), out int charId))
+            {
+                source.TriggerEvent("vMenu:SaveOwnedVehicle:reply", rpcId, false, "Could not resolve active character ID.");
+                return;
+            }
+
+            string safeSavedName = (savedName ?? string.Empty).Trim();
+            string safeDisplayName = displayName ?? string.Empty;
+            string safeVehicleJson = vehicleJson ?? "{}";
+
+            try
+            {
+                dynamic oxmysql = Exports["oxmysql"];
+                string query =
+                    $"INSERT INTO {OwnedVehiclesTable} (char_id, plate, model, display_name, saved_name, vehicle_json) " +
+                    "VALUES (@char_id, @plate, @model, @display_name, @saved_name, @vehicle_json) " +
+                    "ON DUPLICATE KEY UPDATE plate = VALUES(plate), model = VALUES(model), display_name = VALUES(display_name), vehicle_json = VALUES(vehicle_json), updated_at = CURRENT_TIMESTAMP";
+                var parameters = new Dictionary<string, object>
+                {
+                    ["@char_id"] = charId,
+                    ["@plate"] = normalizedPlate,
+                    ["@model"] = model.ToString(),
+                    ["@display_name"] = safeDisplayName,
+                    ["@saved_name"] = safeSavedName,
+                    ["@vehicle_json"] = safeVehicleJson,
+                };
+
+                oxmysql.insert(query, parameters, new Action<object>((insertResult) =>
+                {
+                    source.TriggerEvent("vMenu:SaveOwnedVehicle:reply", rpcId, true, string.Empty);
+                }));
+            }
+            catch (Exception ex)
+            {
+                Log($"Owned vehicle save failed: {ex.Message}", LogLevel.warning);
+                source.TriggerEvent("vMenu:SaveOwnedVehicle:reply", rpcId, false, "Database insert failed.");
+            }
+        }
         #endregion
 
         #region Constructor

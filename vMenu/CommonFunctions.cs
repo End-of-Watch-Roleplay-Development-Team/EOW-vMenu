@@ -1656,11 +1656,64 @@ namespace vMenuClient
                         // If the name is not invalid.
                         if (!string.IsNullOrEmpty(saveName))
                         {
+                            saveName = saveName.Trim();
+                            if (string.IsNullOrEmpty(saveName))
+                            {
+                                Notify.Error(CommonErrors.InvalidSaveName);
+                                return;
+                            }
+
+                            var desiredPlate = (vi.plateText ?? string.Empty).Trim().ToUpperInvariant();
+                            while (true)
+                            {
+                                var enteredPlate = await GetUserInput(windowTitle: "Enter License Plate", defaultText: desiredPlate, maxInputLength: 8);
+                                if (string.IsNullOrWhiteSpace(enteredPlate))
+                                {
+                                    Notify.Error(CommonErrors.InvalidInput);
+                                    return;
+                                }
+
+                                desiredPlate = enteredPlate.Trim().ToUpperInvariant();
+                                if (desiredPlate.Length > 8)
+                                {
+                                    desiredPlate = desiredPlate.Substring(0, 8);
+                                }
+
+                                var plateCheck = await MainMenu.CheckOwnedVehiclePlate(desiredPlate, saveName);
+                                if (!string.IsNullOrEmpty(plateCheck.ErrorMessage))
+                                {
+                                    Notify.Error($"Plate check failed: {plateCheck.ErrorMessage}");
+                                    return;
+                                }
+
+                                if (plateCheck.IsDuplicate)
+                                {
+                                    Notify.Error("That plate is already in use. Please choose a different plate.");
+                                    continue;
+                                }
+
+                                vi.plateText = desiredPlate;
+                                break;
+                            }
+
                             // Save everything from the dictionary into the client's kvp storage.
                             // If the save was successfull:
                             if (StorageManager.SaveVehicleInfo("veh_" + saveName, vi, false))
                             {
                                 Notify.Success($"Vehicle {saveName} saved.");
+
+                                var saveResult = await MainMenu.SaveOwnedVehicle(
+                                    vi.model,
+                                    vi.name,
+                                    saveName,
+                                    vi.plateText,
+                                    JsonConvert.SerializeObject(vi)
+                                );
+
+                                if (!saveResult.Success)
+                                {
+                                    Notify.Alert($"Vehicle saved locally, but DB ownership save failed: {saveResult.ErrorMessage}");
+                                }
                             }
                             // If the save was not successfull:
                             else
@@ -1677,7 +1730,53 @@ namespace vMenuClient
                     // We need to update an existing slot.
                     else
                     {
+                        var saveName = updateExistingSavedVehicleName.Trim();
+                        var desiredPlate = (vi.plateText ?? string.Empty).Trim().ToUpperInvariant();
+                        while (true)
+                        {
+                            var enteredPlate = await GetUserInput(windowTitle: "Enter License Plate", defaultText: desiredPlate, maxInputLength: 8);
+                            if (string.IsNullOrWhiteSpace(enteredPlate))
+                            {
+                                Notify.Error(CommonErrors.InvalidInput);
+                                return;
+                            }
+
+                            desiredPlate = enteredPlate.Trim().ToUpperInvariant();
+                            if (desiredPlate.Length > 8)
+                            {
+                                desiredPlate = desiredPlate.Substring(0, 8);
+                            }
+
+                            var plateCheck = await MainMenu.CheckOwnedVehiclePlate(desiredPlate, saveName);
+                            if (!string.IsNullOrEmpty(plateCheck.ErrorMessage))
+                            {
+                                Notify.Error($"Plate check failed: {plateCheck.ErrorMessage}");
+                                return;
+                            }
+
+                            if (plateCheck.IsDuplicate)
+                            {
+                                Notify.Error("That plate is already in use. Please choose a different plate.");
+                                continue;
+                            }
+
+                            vi.plateText = desiredPlate;
+                            break;
+                        }
+
                         StorageManager.SaveVehicleInfo("veh_" + updateExistingSavedVehicleName, vi, true);
+                        var saveResult = await MainMenu.SaveOwnedVehicle(
+                            vi.model,
+                            vi.name,
+                            saveName,
+                            vi.plateText,
+                            JsonConvert.SerializeObject(vi)
+                        );
+
+                        if (!saveResult.Success)
+                        {
+                            Notify.Alert($"Vehicle saved locally, but DB ownership save failed: {saveResult.ErrorMessage}");
+                        }
                     }
 
                 }
